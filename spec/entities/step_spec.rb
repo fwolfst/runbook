@@ -8,6 +8,15 @@ RSpec.describe Runbook::Entities::Step do
     expect(step.title).to eq(title)
   end
 
+  context "with tags" do
+    let(:tags) { [:suse] }
+    let(:step) { Runbook::Entities::Step.new(title, tags: tags) }
+
+    it "has tags" do
+      expect(step.tags).to eq(tags)
+    end
+  end
+
   it "does not require arguments" do
     expect(Runbook::Entities::Step.new).to be_a(Runbook::Entities::Step)
   end
