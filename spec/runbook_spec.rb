@@ -3,6 +3,7 @@ require "spec_helper"
 RSpec.describe Runbook do
   let(:title) { "Some Title" }
   let(:tags) { [:mutator, :redhat] }
+  let(:labels) { {env: :prod, cloud_provider: :aws} }
   let(:book) { Runbook.book(title) {} }
 
   it "has a version number" do
@@ -31,6 +32,14 @@ RSpec.describe Runbook do
 
       it "sets the books tags" do
         expect(book.tags).to eq(tags)
+      end
+    end
+
+    context "with labels" do
+      let(:book) { Runbook.book(title, labels: labels) {} }
+
+      it "sets the books labels" do
+        expect(book.labels).to eq(labels)
       end
     end
 
@@ -66,6 +75,14 @@ RSpec.describe Runbook do
 
       it "sets the sections tags" do
         expect(section.tags).to eq(tags)
+      end
+    end
+
+    context "with labels" do
+      let(:section) { Runbook.section(title, labels: labels) {} }
+
+      it "sets the sections labels" do
+        expect(section.labels).to eq(labels)
       end
     end
 
@@ -107,6 +124,15 @@ RSpec.describe Runbook do
       it "sets the steps tags" do
         expect(step.title).to be_nil
         expect(step.tags).to eq(tags)
+      end
+    end
+
+    context "with labels" do
+      let(:step) { Runbook.step(labels: labels) {} }
+
+      it "sets the steps labels" do
+        expect(step.title).to be_nil
+        expect(step.labels).to eq(labels)
       end
     end
 

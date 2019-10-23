@@ -1096,17 +1096,17 @@ OUTPUT
     end
   end
 
-  context "with tags" do
+  context "with tags and labels" do
     let(:run) { :ssh_kit }
     let(:output) { StringIO.new }
     let(:book) do
       Runbook.book "My Book", :redhat do
-        section "My Section", :test do
+        section "My Section", :test, labels: {env: :prod} do
           step "Skip me", :skip do
             note "I'm skipped"
           end
 
-          step :test, :skip do
+          step :test, :skip, labels: {env: :stg} do
             note "hi"
           end
         end
@@ -1114,10 +1114,10 @@ OUTPUT
     end
     let(:tag_output) do
       [
-        "Runbook::Entities::Book: My Book [:redhat]",
-        "Runbook::Entities::Section: My Section [:test]",
-        "Runbook::Entities::Step: Skip me [:skip]",
-        "Runbook::Entities::Step:  [:test, :skip]",
+        "Runbook::Entities::Book: My Book [:redhat] {}",
+        "Runbook::Entities::Section: My Section [:test] {:env=>:prod}",
+        "Runbook::Entities::Step: Skip me [:skip] {}",
+        "Runbook::Entities::Step:  [:test, :skip] {:env=>:stg}",
       ]
     end
 
@@ -1129,7 +1129,7 @@ OUTPUT
 
     around(:each) do |example|
       run_module = "Runbook::Runs::#{run.to_s.camelize}".constantize
-      hook_name = :print_tags
+      hook_name = :print_tags_and_labels
 
       begin
         run_module.register_hook(
@@ -1137,7 +1137,7 @@ OUTPUT
           :before,
           Runbook::Entity,
         ) do |object, metadata|
-          metadata[:toolbox].output("#{object.class}: #{object.title} #{object.tags}")
+          metadata[:toolbox].output("#{object.class}: #{object.title} #{object.tags} #{object.labels}")
         end
 
         example.run
